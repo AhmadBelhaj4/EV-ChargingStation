@@ -109,6 +109,12 @@ A full gameplay demonstration of the project is available here:
 
 The video demonstrates the different interactive environments developed for the project, including the Battery Thermal Management System.
 
+### Battery Cooling System Gameplay Demonstration : Short format
+
+The part i did of the project is available here:
+
+🎥 **https://youtu.be/YmDXvR9qYHk**
+
 ### BTMS Demo Highlights
 
 The Battery Thermal Management section demonstrates:
