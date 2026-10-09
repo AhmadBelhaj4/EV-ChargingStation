@@ -111,9 +111,9 @@ The video demonstrates the different interactive environments developed for the 
 
 ### Battery Cooling System Gameplay Demonstration : Short format
 
-The part i did of the project is available here:
+My part of the project is available here:
 
-🎥 **https://youtu.be/YmDXvR9qYHk**
+🎥 **https://youtu.be/5vsbDxJqS_8**
 
 ### BTMS Demo Highlights
 
