@@ -1,0 +1,312 @@
+\documentclass[12pt,a4paper,oneside]{report}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{setspace}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{tocbibind}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{microtype}
+
+% Page geometry for an extensive academic/technical report layout
+\geometry{
+    a4paper,
+    top=2.54cm,
+    bottom=2.54cm,
+    left=3.17cm,
+    right=3.17cm
+}
+
+% Code listing settings for technical appendices and inline code
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+\lstset{style=mystyle}
+
+% Custom chapter formatting for a professional look
+\titleformat{\chapter}[display]
+  {\normalfont\Huge\bfseries}{\chaptertitlename\ \thechapter}{20pt}{\Huge}
+\titlespacing*{\chapter}{0pt}{-20pt}{40pt}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[R]{\thepage}
+\fancyhead[L]{EV Battery \& Energy Twin Simulation - Technical Report}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% Line spacing
+\onehalfspacing
+
+\begin{document}
+
+% ==============================================================================
+% TITLE PAGE
+% ==============================================================================
+\begin{titlepage}
+    \begin{center}
+        \vspace*{2cm}
+        
+        \Huge
+        \textbf{Comprehensive System Architecture and Technical Analysis Report}
+        
+        \vspace{1.5cm}
+        
+        \LARGE
+        \textbf{Project: Electric Vehicle Battery Cooling, Assembly, and Digital Twin Energy Simulation}
+        
+        \vspace{2cm}
+        
+        \Large
+        \textbf{Covering the Three Core Environments:} \\
+        \vspace{0.5cm}
+        \textit{1. The Main Scene (Workshop \& Assembly)} \\
+        \textit{2. The Cooling Scene (Battery Thermal Management)} \\
+        \textit{3. The Solar Twin Scene (Energy Infrastructure \& Weather)}
+        
+        \vspace{3cm}
+        
+        \vfill
+        
+        \large
+        \textbf{Prepared for Technical Review}
+        
+        \vspace{1cm}
+        
+        \normalsize
+        \today
+        
+    \end{center}
+\end{titlepage}
+
+% ==============================================================================
+% ABSTRACT
+% ==============================================================================
+\begin{abstract}
+\noindent This exhaustive technical report documents the architecture, software engineering principles, and interactive design of a complex 3D simulation developed within the Unity Engine. The application serves as an educational and procedural training tool focused on the lifecycle and operational management of Electric Vehicle (EV) battery systems and their surrounding infrastructure. The software is distinctly segmented into three primary interactive environments (Unity Scenes): \textbf{The Main Scene}, which serves as a tactile workshop for physical component assembly and pipe welding; \textbf{The Cooling Scene}, an intricate simulation of fluid dynamics, spline routing, and thermal mitigation within an EV battery pack; and \textbf{The Solar Twin Scene}, a macroscopic digital twin that models renewable energy generation, facility-level battery storage, variable weather states, and dynamic load balancing. This document details the algorithmic foundations of the grid-snapping mechanics, the mathematics driving the thermal and energy simulations, the overarching progression systems (Quest and Timer modules), and the inter-scene communications that bind the project into a cohesive user experience.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+% ==============================================================================
+% CHAPTER 1: INTRODUCTION
+% ==============================================================================
+\chapter{Introduction}
+
+\section{Project Overview}
+The transition to electric mobility necessitates a deep understanding of energy storage, thermal management, and renewable grid integration. The EV Battery Cooling and Energy Simulation project was conceived to abstract these complex, real-world engineering challenges into a highly interactive, physically accurate 3D virtual environment. By leveraging the Unity game engine, the project provides a hands-on, exploratory experience where users must actively solve spatial assembly puzzles, route cooling infrastructure, and manage fluctuating energy economies.
+
+\section{The Three-Scene Architecture}
+A critical design decision in the development of this project was the modular separation of concerns into three distinct Unity Scenes. This approach not only optimizes memory overhead and rendering performance but also logically isolates the different pedagogical goals of the simulation:
+
+\begin{enumerate}
+    \item \textbf{The Main Scene (\texttt{0.unity} / Workshop):} The genesis of the user's journey. It functions as a mechanical workshop where precision assembly takes place. The focus here is on spatial reasoning, tactile interaction with tools, and the procedural construction of hardware components before they are installed in the vehicle.
+    \item \textbf{The Cooling Scene (\texttt{cooling scene.unity}):} A micro-scale dive into the internal architecture of the EV battery pack. This scene challenges the user to understand fluid flow and thermal dynamics, requiring them to route cooling pipes effectively across heat-generating battery cells.
+    \item \textbf{The Solar Twin Scene (\texttt{SolarTwinScene.unity}):} A macro-scale "Digital Twin" of the charging facility. It shifts the user's perspective from the mechanical to the logistical, simulating the environmental variables (weather, time of day) that impact solar energy generation and the complex load balancing required to charge the vehicle.
+\end{enumerate}
+
+\section{Core Systems and Global Mechanics}
+Beyond the isolated scenes, the project utilizes persistent data structures and global managers. The \texttt{QuestManager.cs} and \texttt{GameTimer.cs} scripts provide a unified layer of user progression, tracking the time taken to complete tasks across scenes and issuing sequential objectives that guide the user from raw component assembly to final grid integration.
+
+% ==============================================================================
+% CHAPTER 2: THE MAIN SCENE (WORKSHOP & ASSEMBLY)
+% ==============================================================================
+\chapter{The Main Scene: Workshop and Assembly}
+
+\section{Scene Objective and Context}
+The Main Scene serves as the interactive hub and the primary mechanical workspace. Before cooling systems can be installed or vehicles charged, the raw infrastructure must be fabricated. The user is placed in a warehouse/garage environment and tasked with assembling the cooling manifolds and piping networks using a grid-based welding table.
+
+\section{The Welding Table Grid System}
+The most technically complex sub-system within the Main Scene is the discrete coordinate grid implemented for pipe assembly. Allowing free-form, physics-based pipe placement would result in microscopic misalignments, rendering the components impossible to weld or integrate into the cooling loops. To solve this, a rigid snapping architecture was engineered.
+
+\subsection{Discrete Coordinate Mapping}
+The \texttt{WeldingTableGrid.cs} script defines a 2D/3D array of valid placement cells relative to the table's local transform. 
+\begin{itemize}
+    \item \textbf{Cell Instantiation:} Upon initialization, the script generates a matrix of invisible trigger colliders or coordinate nodes.
+    \item \textbf{Occupancy Tracking:} Each cell maintains a boolean state (\texttt{isOccupied}). When a pipe component (\texttt{GridPipe.cs}) is successfully snapped into a cell, the state is locked, preventing overlapping geometry.
+\end{itemize}
+
+\subsection{The Grid Snap Manager}
+The \texttt{GridSnapManager.cs} operates as a continuous state machine monitoring the user's interactions (via \texttt{MouseGrabber.cs} or VR-equivalent grabbers). 
+\begin{enumerate}
+    \item \textbf{Proximity Detection:} As a held pipe translates through world space, the manager projects its position onto the table's local plane.
+    \item \textbf{Nearest Neighbor Search:} It calculates the Euclidean distance to all available grid cells. To optimize performance, this is often constrained by a bounding box trigger around the table.
+    \item \textbf{Ghosting and Visual Feedback:} Once the nearest valid cell is identified, a translucent "ghost" prefab or a highlighting shader is activated at the target cell's coordinates, providing the user with unambiguous visual feedback regarding where the pipe will land.
+    \item \textbf{Release and Lock:} Upon releasing the grab input, the pipe's transform is interpolated to exactly match the cell's coordinates, and its \texttt{Rigidbody} constraints are frozen (\texttt{LockToGrid.cs}).
+\end{enumerate}
+
+\section{Interactive Welding Mechanics}
+Once components are positioned adjacently on the grid, they remain functionally separate GameObjects. The user must fuse them using the \texttt{PickupableWeldingTool.cs}.
+
+\subsection{Tool Activation and Triggers}
+The welding tool requires a secondary input (e.g., holding a trigger button) to activate. When active, a Raycast or small SphereCollider at the tool's tip begins searching for objects on the \texttt{Weldable} layer.
+
+\subsection{Weldable Holes and the Merging Algorithm}
+The extremities of the pipes feature \texttt{WeldableHole.cs} scripts. 
+\begin{itemize}
+    \item \textbf{Progress Tracking:} When the active welding tip intersects a weldable hole, a progress float increments over time (\texttt{Time.deltaTime}), accompanied by particle emissions (sparks) and auditory feedback.
+    \item \textbf{The Merge Operation:} Once progress reaches 100\%, the system executes a complex merge. It identifies the two adjacent pipe GameObjects, destroys one, and swaps the other with a unified "welded manifold" prefab, or logically groups them under a single parent transform, updating the \texttt{WeldingTableGrid} to reflect that the multi-cell structure moves as a single unit.
+\end{itemize}
+
+\section{Progression Integration}
+The Main Scene introduces the \texttt{QuestManager.cs}. The user is guided by a UI overlay (managed by \texttt{QuestUI.cs}) that updates as specific assembly milestones are hit. For example, completing a specific weld updates the quest state to "Install Manifold in Vehicle," which triggers the interactable prompt (\texttt{ProximityUITrigger.cs}) allowing the user to transition to the Cooling Scene.
+
+% ==============================================================================
+% CHAPTER 3: THE COOLING SCENE
+% ==============================================================================
+\chapter{The Cooling Scene: Thermal Management}
+
+\section{Scene Objective and Context}
+Transitioning to the \texttt{cooling scene.unity}, the user is presented with the exposed chassis and battery pack of the EV. The objective shifts from rigid assembly to organic routing and thermal fluid dynamics. The user must lay out a network of cooling pipes over the battery modules, ensuring proper coolant flow without physically intersecting the battery cells.
+
+\section{Spline Routing and Height Adjustments}
+Unlike the rigid grid of the Main Scene, the cooling pipes within the vehicle must navigate a complex 3D topography. This is achieved using a spline-based generation system.
+
+\subsection{Spline Node Interaction}
+The system utilizes \texttt{SnapToPlacecooling.cs} to manage the nodes of a continuous spline curve. The user grabs and drags these nodes across the surface of the battery pack. The underlying mesh of the pipe is dynamically generated along the curve of the spline using components like \texttt{CableLineFromSegments.cs}.
+
+\subsection{The Center UI Cursor and Vertical Delta}
+A unique UX challenge in this scene was allowing users to manage the Z-depth (or Y-height in Unity coordinates) of the spline nodes using standard 2D screen inputs or basic 3D controllers. The \texttt{CenterUICursorcooling.cs} script solves this by projecting a cursor onto the battery pack. 
+While dragging a node laterally, the user can use a secondary input (scroll wheel, D-pad) to increase or decrease the vertical offset of the node. This is critical: if the pipe is routed too low, it intersects the battery geometry (a failure state); if too high, it may clip through the vehicle floorboard.
+
+\section{Liquid Flow and Thermal Dynamics}
+Once the physical routing connects the input pump to the output radiator, the \texttt{CoolingSystem.cs} and \texttt{PipeLiquidController.cs} evaluate the network.
+
+\subsection{Flow Efficiency Calculation}
+The efficiency of the coolant flow ($\eta_{flow}$) is calculated based on two primary factors derived from the user's spline route:
+\begin{enumerate}
+    \item \textbf{Total Spline Length ($L$):} Longer routes increase friction and pressure drop, reducing flow rate.
+    \item \textbf{Curvature Penalty ($\sum K$):} Sharp bends in the spline generate turbulent flow and significant pressure loss. The script analyzes the angles between adjacent spline segments to calculate a cumulative penalty.
+\end{enumerate}
+The resulting flow rate directly dictates the cooling capacity of the system.
+
+\subsection{Thermal Mitigation Algorithm}
+The EV battery pack has a base heat generation rate ($Q_{gen}$) depending on its simulated load. The cooling system provides a heat dissipation rate ($Q_{diss}$) proportional to the flow efficiency. 
+The battery temperature ($T_{batt}$) is updated dynamically:
+\begin{equation}
+    T_{batt}(t) = T_{batt}(t-1) + \left( Q_{gen} - Q_{diss}(\eta_{flow}) \right) \times \Delta t
+\end{equation}
+If the user's pipe routing is highly inefficient (e.g., too many sharp turns), $Q_{diss}$ will be insufficient, causing $T_{batt}$ to rise toward a critical thermal runaway threshold, prompting the user to redesign their layout.
+
+% ==============================================================================
+% CHAPTER 4: THE SOLAR TWIN SCENE
+% ==============================================================================
+\chapter{The Solar Twin Scene: Digital Energy Infrastructure}
+
+\section{Scene Objective and Context}
+The \texttt{SolarTwinScene.unity} represents a paradigm shift in the simulation. Operating as a Digital Twin, it abstracts the physical vehicle into a node within a larger electrical grid. The user stands in a control room or views a macroscopic dashboard (\texttt{DashboardBuilder.cs}) overlooking the charging facility, solar array, and battery banks. The goal is to successfully charge the EV without causing a blackout or depleting the facility reserves inappropriately.
+
+\section{Environmental Simulation and Weather States}
+The core engine of this scene is \texttt{EnergySystem.cs}, which acts as the central state manager. It simulates the impact of external environmental factors on the facility's power generation capabilities.
+
+\subsection{Weather Enumeration and Production Baselines}
+The system defines an enumeration \texttt{WeatherType} \{ Sunny, Cloudy, Rainy, Night \}. The user can trigger weather changes (via \texttt{ButtonWeatherConnector.cs} and \texttt{WeatherTheme.cs}), or they shift dynamically.
+Each state radically alters the mathematical baseline of the solar array:
+\begin{itemize}
+    \item \textbf{Sunny:} Maximum irradiance. Base production = 100 kW. High inverter efficiency (96\%).
+    \item \textbf{Cloudy:} Diffuse irradiance. Base production = 65 kW. Efficiency drops to 89\% due to lower voltage strings.
+    \item \textbf{Rainy:} Minimal irradiance. Base production = 30 kW. Efficiency at 82\%.
+    \item \textbf{Night:} Zero direct irradiance. Base production relies on ambient urban light or auxiliary wind (simulated as 5 kW).
+\end{itemize}
+
+\subsection{Stochastic Variation and Smoothing}
+To prevent the UI from displaying static, unrealistic numbers, the system injects stochastic noise (random variations within defined bounds) into the production variables every few seconds. 
+To ensure the UI (\texttt{SolarUIManager.cs}) remains readable, these target values are passed through a continuous linear interpolation (\texttt{Mathf.Lerp}) loop.
+\begin{lstlisting}[language=csharp, caption=Interpolation Logic in EnergySystem.cs]
+// Example of the smoothing algorithm applied per frame
+currentInputPower = Mathf.Lerp(currentInputPower, targetInputPower, Time.deltaTime * productionSmooth);
+\end{lstlisting}
+This yields a dashboard that feels "alive", highly reminiscent of industrial SCADA interfaces.
+
+\section{Load Balancing and The Charging Cycle}
+The ultimate goal of the Solar Twin Scene is to transfer energy into the EV (\texttt{carChargeProgress}). However, this represents a massive electrical load (\texttt{chargerConsumption}).
+
+\subsection{Battery Buffer Mechanics}
+The facility features its own stationary battery storage (\texttt{batteryLevel}). 
+\begin{itemize}
+    \item \textbf{Surplus Generation:} When Solar Production > Vehicle Load, the excess energy charges the facility battery.
+    \item \textbf{Deficit Generation:} During Cloudy, Rainy, or Night states, Solar Production < Vehicle Load. The system must draw from the facility battery to maintain the vehicle charge.
+\end{itemize}
+
+\subsection{Failure States and Emergency Systems}
+If the user attempts to charge the vehicle during a sustained Night state without sufficient facility battery reserves, the \texttt{batteryLevel} will hit 0\%. This triggers a system-wide trip, automatically shutting off the charger. The \texttt{NightEmergencySystem.cs} script monitors these extreme edge cases, potentially triggering backup generators or failing the user's current quest objective, enforcing the educational lesson on grid load balancing.
+
+% ==============================================================================
+% CHAPTER 5: PROGRESSION, UI, AND INTER-SCENE COMMUNICATION
+% ==============================================================================
+\chapter{Progression, UI, and Global Architecture}
+
+\section{Unified Quest Management}
+Binding the three disparate scenes together is the \texttt{QuestManager.cs}. Utilizing the Singleton pattern or persistent \texttt{ScriptableObjects}, the quest state survives scene transitions.
+\begin{itemize}
+    \item \textbf{Main Scene Quests:} Focus on assembly (e.g., "Weld 3 pipe joints").
+    \item \textbf{Cooling Scene Quests:} Focus on validation (e.g., "Achieve 90\% cooling efficiency").
+    \item \textbf{Solar Twin Quests:} Focus on management (e.g., "Charge vehicle to 100\% without grid failure").
+\end{itemize}
+The \texttt{QuestUI.cs} dynamically updates text elements on the user's HUD, hiding itself during cinematic cutscenes and reappearing when interactivity is restored.
+
+\section{The Game Timer and Scoring System}
+To introduce a gamified, competitive element, \texttt{GameTimer.cs} tracks the overall execution time. 
+The timer begins after the introductory sequences in the Main Scene and halts only when the final vehicle charging sequence in the Solar Twin Scene is complete.
+
+\subsection{Performance Evaluation}
+At the simulation's conclusion, a post-game UI panel is instantiated. It calculates a final score based on:
+\begin{enumerate}
+    \item \textbf{Speed:} Total elapsed time against a par value.
+    \item \textbf{Precision:} Penalty time added for bad welds or inefficient cooling routes.
+    \item \textbf{Energy Efficiency:} Bonus points for charging primarily during optimal solar conditions.
+\end{enumerate}
+The system translates this score into a visual star rating using Unicode glyphs (e.g., $\bigstar \bigstar \bigstar$) rendered flawlessly via custom TextMeshPro configurations.
+
+\section{Scene Transitions}
+Navigating between the macroscopic and microscopic views is handled by \texttt{Scenes.cs} and \texttt{BackToMainScene.cs}. These scripts manage the asynchronous loading of Unity scenes, ensuring that large meshes and textures are loaded efficiently without freezing the application thread, and that persistent data (like the structure of the welded manifold) is correctly serialized and passed to the subsequent scene.
+
+% ==============================================================================
+% CHAPTER 6: CONCLUSION AND FUTURE EXPANSION
+% ==============================================================================
+\chapter{Conclusion and Future Expansion}
+
+\section{Summary of Achievements}
+The EV Battery Cooling and Energy Simulation stands as a highly complex, multi-faceted interactive application. By dividing the user experience into the tactile Workshop (Main Scene), the fluid-dynamic Battery Pack (Cooling Scene), and the macro-economic Digital Twin (Solar Twin Scene), the software provides a holistic educational experience. The bespoke grid-snapping algorithms ensure frustrating-free assembly, while the stochastic noise algorithms in the energy system provide a lifelike challenge to the user's load-balancing skills.
+
+\section{Future Architectural Considerations}
+While the current architecture is robust, future scaling of the project should consider the following enhancements:
+\begin{itemize}
+    \item \textbf{Multiplayer Integration:} Implementing a networking layer (such as Photon or Unity Netcode) to allow collaborative assembly in the Main Scene or simultaneous monitoring in the Solar Twin Scene.
+    \item \textbf{Compute Shader Fluid Dynamics:} Transitioning the mathematical cooling estimation in \texttt{CoolingSystem.cs} to a GPU-accelerated Eulerian fluid simulation using Compute Shaders, providing real-time volumetric temperature rendering inside the battery pack.
+    \item \textbf{Extended Weather APIs:} Connecting the \texttt{EnergySystem.cs} to real-world REST APIs (e.g., OpenWeatherMap) to drive the Solar Twin Scene using live, real-world data based on the user's geographic location.
+\end{itemize}
+
+\end{document}
